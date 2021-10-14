@@ -1,3 +1,9 @@
+# https://google.github.io/mediapipe/solutions/face_mesh#python-solution-api
+# cloned from https://www.youtube.com/watch?v=wyWmWaXapmI
+# modified by u2pia.2019@gmail.com
+#   - fixing some bug
+
+
 from numpy.lib.function_base import _median_dispatcher
 import streamlit as st
 import mediapipe as mp
@@ -50,6 +56,7 @@ st.sidebar.subheader('parameters')
 # 이건 뭐하는건가?
 @st.cache()
 
+# 원본의 비율을 유지하면서 크기를 줄이는 역할
 # inter는 interpolation
 def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     dim=None
@@ -278,15 +285,23 @@ elif app_mode == "Run on Video":
             prevTime = curTime
 
             if record:
-                # print(f"writing frame: {i}")
                 out.write(frame)
 
             kpi1_text.write(f"<h1 style='text-align:center; color=red;'>{int(fps)}</h1>", unsafe_allow_html=True)
             kpi2_text.write(f"<h1 style='text-align:center; color=red;'>{face_count}</h1>", unsafe_allow_html=True)
             kpi3_text.write(f"<h1 style='text-align:center; color=red;'>{width}</h1>", unsafe_allow_html=True)
 
+            # src: [required] source/input image
+            # dsize: [required] desired size for the output image
+            # fx: [optional] scale factor along the horizontal axis
+            # fy: [optional] scale factor along the vertical axis
+            # TODO: 근데, dsize를 (0,0)으로 한것은 무슨 의미?
             frame=cv2.resize(frame, (0,0), fx=0.8, fy=0.8)
-            frame=image_resize(image=frame, width=640)
+
+            # 웹 브라우저에 띄우기 전에 크기를 줄여 줌.
+            frame=image_resize(image=frame, width=640) 
+
+            # stframe 위치에 image를 업데이트 함. 즉, 얘는 영상 tag가 아니라능..
             stframe.image(frame, channels='BGR', use_column_width = True)
     
     # print('Play DONE')
