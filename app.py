@@ -18,6 +18,17 @@ st.title('Face Mesh Application using Mediapipe')
 # 사이드바 생성
 # - 멀티라인 text는 """ 블라블라 """를 이용. 얘는 주석이 아님
 # - 사이드바의 스타일을 이렇게 만드네... 이건 좀 더 공부해 봐야겠음.
+# unsafe_allow_html 옵션--> 기본적으로 markdown에서 HTML 문법 사용을 허락하지 않는데, 이 값을 True로 하면 html tag를 사용가능함.
+#   - 사용못하게 하는 이유는 
+#       we refer to HTML as “unsafe” as a keyword argument, 
+#       to highlight the fact that you can run JavaScript within the widget.
+#       We’re highlighting the fact that Streamlit itself will not be able to prove the code’s safety, 
+#       since a malicious 3rd-party could inject code into your website, 
+#       or the Streamlit app creator might write code in such a way as to allow for code injection attacks 11. 
+#       So by default, we disable evaluating code inside of an HTML snippet, 
+#       but allow a user to set the keyword argument to say “I understand that this is potentially risky, 
+#       but I want to do it anyway”
+#       - https://discuss.streamlit.io/t/why-is-using-html-unsafe/4863
 st.markdown(
     """
     <style>
@@ -198,12 +209,12 @@ elif app_mode == "Run on Video":
     fps_input = int(vid.get(cv2.CAP_PROP_FPS))
 
     ## Recording
-    # codec = cv2.VideoWriter_fourcc('V','P','0','9') # 이건 또 뭐야... -=> VP9 코덱 쓴다는 말
-
+    # codec = cv2.VideoWriter_fourcc('V','P','0','9') # => VP9 코덱 
+    # codec = cv2.VideoWriter_fourcc('M','J','P','G') # => MJPEG 코덱
+    # Windows에서는 이렇게 하는게 가장 안정적이라고 하는 글을 봐서 그렇게 함. --> 동작함.
     codec = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter('output.avi', codec, fps_input, (width, height))
-    # codec = cv2.VideoWriter_fourcc('M','J','P','G') # 이건 또 뭐야... -=> VP9 코덱 쓴다는 말
-    # out = cv2.VideoWriter('output.mjpg',codec, fps_input, (width, height))
+
 
     st.sidebar.text('Input Video')
     st.sidebar.video(tffile.name)
@@ -267,7 +278,7 @@ elif app_mode == "Run on Video":
             prevTime = curTime
 
             if record:
-                print(f"writing frame: {i}")
+                # print(f"writing frame: {i}")
                 out.write(frame)
 
             kpi1_text.write(f"<h1 style='text-align:center; color=red;'>{int(fps)}</h1>", unsafe_allow_html=True)
@@ -278,7 +289,7 @@ elif app_mode == "Run on Video":
             frame=image_resize(image=frame, width=640)
             stframe.image(frame, channels='BGR', use_column_width = True)
     
-    print('Play DONE')
+    # print('Play DONE')
     vid.release()
     out.release()
 
